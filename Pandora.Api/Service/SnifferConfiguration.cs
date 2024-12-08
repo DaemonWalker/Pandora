@@ -1,26 +1,15 @@
+using Pandora.Api.Contract;
 using Pandora.Api.Data;
 
 namespace Pandora.Api.Service;
 
-public class SnifferConfigurationService<T>
+public class SnifferConfigurationService(PandoraDbContext dbContext)
 {
-    private IReadOnlyDictionary<string, string> configuration;
-
-    public SnifferConfigurationService(PandoraDbContext dbContext)
+    public string Get(ISniffer sniffer, string key)
     {
-        var type = typeof(T).FullName;
-        var list = dbContext.Configurations.Where(p => p.Type == type).ToList();
-        configuration = list.ToDictionary(p => p.Key, p => p.Value);
-    }
-    
-
-    public string Get(string key)
-    {
+        var configuration = dbContext.Configurations.Where(
+                c => c.Type == sniffer.SourceName && c.Key == key)
+            .ToDictionary(p => p.Key, p => p.Value);
         return configuration[key];
-    }
-
-    public string this[string key]
-    {
-        get => configuration[key];
     }
 }

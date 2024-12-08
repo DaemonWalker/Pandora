@@ -5,12 +5,14 @@ using Pandora.Api.Model;
 namespace Pandora.Api.Controller;
 
 [ApiController]
+[Route("[controller]/[action]")]
 public class SearchController(IEnumerable<ISniffer> sniffers, ILogger<SearchController> logger) : ControllerBase
 {
-    public async Task<IActionResult> SearchAsync(string text)
+    [HttpGet("{text}")]
+    public async Task<IEnumerable<ResultModel>> SearchAsync(string text)
     {
         var searchModel = new SearchModel() { Text = text };
-        var tasks = sniffers.ToDictionary(p => p.SourceName, p => p.SniffAsync(searchModel));
-        var result = await Task.WhenAll(tasks.Values);
+        var result = await Task.WhenAll(sniffers.Select(p => p.SniffAsync(searchModel)));
+        return result.Select((p, idx) => new ResultModel(sniffers.ElementAt(idx).SourceName, p)).ToList();
     }
 }
