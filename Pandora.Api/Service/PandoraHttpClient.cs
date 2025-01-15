@@ -11,13 +11,18 @@ public sealed class PandoraHttpClient(IHttpClientFactory httpClientFactory, Html
 
     public async Task<HtmlDocument?> GetAsync(RequestModel request)
     {
-        return await GetHtmlDocumentAsync(request);
+        return await HtmlDocumentAsync(request);
+    }
+
+    public Task<Stream> GetStreamAsync(RequestModel request)
+    {
+        return StreamAsync(request);
     }
 
     public async Task<HtmlDocument?> PostJsonAsync<T>(RequestModel request, T t)
     {
         var json = JsonContent.Create(t, options: _jsonSerializerOptions);
-        return await GetHtmlDocumentAsync(request, json);
+        return await HtmlDocumentAsync(request, json);
     }
 
     public async Task<HtmlDocument?> PostFormAsync(
@@ -26,10 +31,10 @@ public sealed class PandoraHttpClient(IHttpClientFactory httpClientFactory, Html
     )
     {
         var content = new FormUrlEncodedContent(formData);
-        return await GetHtmlDocumentAsync(request, content);
+        return await HtmlDocumentAsync(request, content);
     }
 
-    private async Task<HtmlDocument?> GetHtmlDocumentAsync(
+    private async Task<HtmlDocument?> HtmlDocumentAsync(
         RequestModel requestInfo,
         HttpContent? content = null
     )
@@ -48,5 +53,16 @@ public sealed class PandoraHttpClient(IHttpClientFactory httpClientFactory, Html
             return doc;
         }
         return null;
+    }
+
+    private async Task<Stream> StreamAsync(RequestModel requestInfo, HttpContent? content = null)
+    {
+        var httpClient = httpClientFactory.CreateClient();
+        var request = new HttpRequestMessage(requestInfo.Method, requestInfo.Url)
+        {
+            Content = content,
+        };
+        var response = await httpClient.SendAsync(request);
+        return await response.Content.ReadAsStreamAsync();
     }
 }

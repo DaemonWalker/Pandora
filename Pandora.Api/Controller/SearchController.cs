@@ -6,13 +6,31 @@ namespace Pandora.Api.Controller;
 
 [ApiController]
 [Route("[controller]/[action]")]
-public class SearchController(IEnumerable<ISniffer> sniffers, ILogger<SearchController> logger) : ControllerBase
+public class SearchController(IEnumerable<ISniffer> sniffers, ILogger<SearchController> logger)
+    : ControllerBase
 {
     [HttpGet("{text}")]
     public async Task<IEnumerable<ResultModel>> SearchAsync(string text)
     {
         var searchModel = new SearchModel() { Text = text };
         var result = await Task.WhenAll(sniffers.Select(p => p.SniffAsync(searchModel)));
-        return result.Select((p, idx) => new ResultModel(sniffers.ElementAt(idx).SourceName, p)).ToList();
+        return result.Select((p, idx) => new ResultModel(sniffers.ElementAt(idx).SourceName, p));
+    }
+
+    [HttpGet("{text}/{source}")]
+    public async Task<ResultModel> SearchBySourceAsync(string text, string source)
+    {
+        var searchModel = new SearchModel() { Text = text };
+        var sniffer = sniffers.FirstOrDefault(p => p.SourceName == source);
+        if (sniffer != null)
+        {
+            var result = await sniffer.SniffAsync(searchModel);
+            return new(source, result);
+        }
+        else
+        {
+            logger.LogWarning("No such source: {name}", source);
+            throw new LogicException("No such source");
+        }
     }
 }
