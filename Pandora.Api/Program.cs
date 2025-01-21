@@ -12,6 +12,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddScoped<ISniffer, BtsowSniffer>();
+builder.Services.AddScoped<ISniffer, CDN1998Sniffer>();
+builder.Services.AddScoped<ISniffer, CDN1999Sniffer>();
+builder.Services.AddTransient<PandoraHttpClient>();
 builder.Services.AddDbContext<PandoraDbContext>(options =>
     options.UseMySql(
         "Server=nas.com;Database=pandora;Uid=root;Pwd=123456;",
@@ -38,6 +41,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapControllers();
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.Run();

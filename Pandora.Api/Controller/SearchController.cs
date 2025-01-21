@@ -17,9 +17,10 @@ public class SearchController(IEnumerable<ISniffer> sniffers, ILogger<SearchCont
         return result.Select((p, idx) => new ResultModel(sniffers.ElementAt(idx).SourceName, p));
     }
 
-    [HttpGet("{text}/{source}")]
-    public async Task<ResultModel> SearchBySourceAsync(string text, string source)
+    [HttpGet("{source}/{text}")]
+    public async Task<ResultModel> SearchBySourceAsync([FromRoute] string source, [FromRoute] string text)
     {
+        logger.LogDebug("Search {text} from {source}", text, source);
         var searchModel = new SearchModel() { Text = text };
         var sniffer = sniffers.FirstOrDefault(p => p.SourceName == source);
         if (sniffer != null)

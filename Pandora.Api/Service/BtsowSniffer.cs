@@ -30,7 +30,13 @@ public class BtsowSniffer(
 
     private async ValueTask<IEnumerable<InfoModel>> SearchAsync(SearchModel searchModel)
     {
-        var url = string.Format(snifferConfiguration.Get(this, "url"), searchModel.Text);
+        var config = snifferConfiguration.Get(this, "url");
+        if (string.IsNullOrEmpty(config))
+        {
+            logger.LogWarning("{source} URL is not configured", SourceName);
+            return [];
+        }
+        var url = string.Format(config, searchModel.Text);
         logger.LogDebug("Search Btsow with URL: {url}", url);
 
         //url = HttpUtility.UrlEncode(url);
