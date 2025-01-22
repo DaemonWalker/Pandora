@@ -2,7 +2,7 @@ namespace Pandora.Api.Model;
 
 public record InfoModel
 {
-    public InfoModel(string name, string link, string? size = null, LinkType linkType = LinkType.Magnet)
+    public InfoModel(string name, string link, string? size = null, LinkType linkType = LinkType.Magnet, int? pageSize = null)
     {
         Name = name;
         Link = link;
@@ -14,4 +14,5 @@ public record InfoModel
     public string? Link { get; init; }
     public string? Size { get; init; }
     public LinkType LinkType { get; init; }
+    public int? PageSize { get; set; }
 }

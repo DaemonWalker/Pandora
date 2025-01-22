@@ -8,4 +8,6 @@ public interface ISniffer
     Task<IEnumerable<InfoModel>> SniffAsync(SearchModel searchModel);
     public IEnumerable<string> GetAllKeys();
     public Task SetConfigurationAsync(Dictionary<string, string> config);
+    public Task<string?> GetMegnetAsync(string url);
+    public Task<Stream?> GetTorrentAsync(string url);
 }

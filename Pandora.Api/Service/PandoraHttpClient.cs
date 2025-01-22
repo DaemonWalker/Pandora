@@ -4,7 +4,7 @@ using RequestModel = Pandora.Api.Model.PandoraHttpClientRequestModel;
 
 namespace Pandora.Api.Service;
 
-public sealed class PandoraHttpClient(IHttpClientFactory httpClientFactory, HtmlWeb htmlWeb)
+public sealed class PandoraHttpClient(IHttpClientFactory httpClientFactory)
 {
     private static readonly JsonSerializerOptions _jsonSerializerOptions =
         new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };

@@ -22,16 +22,20 @@ public class SearchController(IEnumerable<ISniffer> sniffers, ILogger<SearchCont
     {
         logger.LogDebug("Search {text} from {source}", text, source);
         var searchModel = new SearchModel() { Text = text };
+        var sniffer = GetSniffer(source);
+
+        var result = await sniffer.SniffAsync(searchModel);
+        return new(source, result);
+    }
+
+    private ISniffer GetSniffer(string source)
+    {
         var sniffer = sniffers.FirstOrDefault(p => p.SourceName == source);
-        if (sniffer != null)
-        {
-            var result = await sniffer.SniffAsync(searchModel);
-            return new(source, result);
-        }
-        else
+        if (sniffer == null)
         {
             logger.LogWarning("No such source: {name}", source);
             throw new LogicException("No such source");
         }
+        return sniffer;
     }
 }

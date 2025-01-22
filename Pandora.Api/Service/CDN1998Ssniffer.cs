@@ -5,7 +5,7 @@ namespace Pandora.Api.Service;
 
 public sealed class CDN1998Sniffer(
     PandoraHttpClient pandoraHttpClient,
-    SnifferConfigurationService snifferConfiguration,
+    ISnifferConfigurationService<CDN1998Sniffer> snifferConfiguration,
     ILogger<CDN1998Sniffer> logger
 ) : CDNSnifferBase(pandoraHttpClient, snifferConfiguration, logger)
 {

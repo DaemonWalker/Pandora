@@ -21,7 +21,7 @@ builder.Services.AddDbContext<PandoraDbContext>(options =>
         new MySqlServerVersion("8.0.0")
     )
 );
-builder.Services.AddScoped(typeof(SnifferConfigurationService));
+builder.Services.AddScoped(typeof(ISnifferConfigurationService<>), typeof(SnifferConfigurationService<>));
 builder.Services.AddHttpClient<HttpClient>(client =>
 {
     client.DefaultRequestHeaders.Add(
