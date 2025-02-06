@@ -5,7 +5,7 @@ using Pandora.Api.Model;
 namespace Pandora.Api.Controller;
 
 [ApiController]
-[Route("[controller]/[action]")]
+[Route("api/[controller]/[action]")]
 public class SearchController(IEnumerable<ISniffer> sniffers, ILogger<SearchController> logger)
     : ControllerBase
 {

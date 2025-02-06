@@ -5,7 +5,7 @@ using Pandora.Api.Contract;
 namespace Pandora.Api.Controller;
 
 [ApiController]
-[Route("[controller]/[action]")]
+[Route("api/[controller]/[action]")]
 public class SnifferController(IEnumerable<ISniffer> sniffers) : ControllerBase
 {
     [HttpGet]

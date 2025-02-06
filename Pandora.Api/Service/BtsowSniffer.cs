@@ -58,12 +58,12 @@ public class BtsowSniffer(
         });
     }
 
-    public Task<string> GetMegnetAsync(string url)
+    public Task<string?> GetMegnetAsync(string url)
     {
         throw new NotImplementedException();
     }
 
-    public Task<Stream> GetTorrentAsync(string url)
+    public Task<Stream?> GetTorrentAsync(string url)
     {
         throw new NotImplementedException();
     }
