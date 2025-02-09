@@ -40,7 +40,7 @@ const items: MenuItem[] = [
 const App: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const {
-    token: { colorBgContainer, borderRadiusLG },
+    token: { colorBgContainer, borderRadiusLG, colorBgLayout },
   } = theme.useToken();
   const location = useLocation();
 
@@ -54,18 +54,16 @@ const App: React.FC = () => {
         <Menu theme="dark" selectedKeys={[selectedKey]} defaultSelectedKeys={['1']} mode="inline" items={items} />
       </Sider>
       <Layout>
-        <Header style={{ padding: 0, background: colorBgContainer }} />
-        <Content style={{ margin: '0 16px' }}>
-          <Breadcrumb style={{ margin: '16px 0' }}>
-            <Breadcrumb.Item>User</Breadcrumb.Item>
-            <Breadcrumb.Item>Bill</Breadcrumb.Item>
-          </Breadcrumb>
+        <Header style={{ padding: 0, background: colorBgLayout }} />
+        <Content style={{ margin: '0 16px', flex: 1 }}>
           <div
             style={{
               padding: 24,
               minHeight: 360,
               background: colorBgContainer,
               borderRadius: borderRadiusLG,
+              maxHeight: "100%",
+              overflow: "auto",
             }}
           >
             <Routes>

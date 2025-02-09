@@ -67,4 +67,10 @@ public class BtsowSniffer(
     {
         throw new NotImplementedException();
     }
+
+    public Task<Dictionary<string, string>> GetAllConfigurationAsync()
+    {
+        logger.LogDebug("Start getting all configuration information for {SourceName}", SourceName);
+        return snifferConfiguration.GetAllConfigurationAsync();
+    }
 }

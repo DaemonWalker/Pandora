@@ -1,20 +1,23 @@
 import { create } from 'zustand';
+import { SearchResultModel } from '../models/SearchResultModel';
+import { ALL } from '../models/Constants';
 
 interface SearchState {
-    searchResults: any[];
+    searchResults: SearchResultModel[];
     error: string | null;
     isLoading: boolean;
-    search: (query: string) => Promise<void>;
+    search: (source: string, query: string) => Promise<void>;
 }
 
 export const useSearchStore = create<SearchState>((set) => ({
     searchResults: [],
     error: null,
     isLoading: false,
-    search: async (query: string) => {
+    search: async (source: string, query: string) => {
         set({ isLoading: true, error: null });
         try {
-            const response = await fetch(`/api/search/${query}`);
+            const url = source === ALL ? `/api/Search/Search/${query}` : `/api/Search/SearchBySource/${source}/${query}`;
+            const response = await fetch(url);
             if (response.ok) {
                 const data = await response.json();
                 set({ searchResults: data, isLoading: false });

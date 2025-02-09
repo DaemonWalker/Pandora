@@ -18,14 +18,24 @@ public class SearchController(IEnumerable<ISniffer> sniffers, ILogger<SearchCont
     }
 
     [HttpGet("{source}/{text}")]
-    public async Task<ResultModel> SearchBySourceAsync([FromRoute] string source, [FromRoute] string text)
+    public async Task<IEnumerable<ResultModel>> SearchBySourceAsync([FromRoute] string source, [FromRoute] string text)
     {
         logger.LogDebug("Search {text} from {source}", text, source);
         var searchModel = new SearchModel() { Text = text };
         var sniffer = GetSniffer(source);
 
         var result = await sniffer.SniffAsync(searchModel);
-        return new(source, result);
+        return [new(source, result)];
+    }
+
+    [HttpPost("{source}")]
+    public async Task<IActionResult> GetMagnetAsync([FromRoute] string source, [FromBody] string url)
+    {
+        logger.LogDebug("Get magnet for {input} from {source}", url, source);
+        var sniffer = GetSniffer(source);
+
+        var magnet = await sniffer.GetMegnetAsync(url);
+        return Ok(magnet);
     }
 
     private ISniffer GetSniffer(string source)

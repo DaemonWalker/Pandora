@@ -1,21 +1,30 @@
-import React, { useState } from 'react';
-import { Select, Input, Button, List, Pagination, Row, Col } from 'antd';
+import React, { useMemo, useState } from 'react';
+import { Select, Input, Button, List, Pagination, Row, Col, message } from 'antd';
 import { useSearchStore } from '../store/useSearchStore';
-
-const contentTypes = [{ value: 0, label: "全部" }, { value: 1, label: "电影" }, { value: 2, label: "电视剧" }];
+import { InfoModel } from '../models/InfoModel';
+import { LinkType } from '../models/LinkType';
+import { useAutoFetchTabKeys } from '../store/allSourceStore';
+import { ALL } from '../models/Constants';
 
 const { Item } = List;
 
 
 export const Search: React.FC = () => {
-    const { searchResults, error, isLoading, search } = useSearchStore();
-    const [selectedTypes, setSelectedTypes] = useState(0);
+    const { tabKeys, isLoading: isSourceLoading } = useAutoFetchTabKeys();
+    const { searchResults, isLoading, search } = useSearchStore();
+    const [selectedTypes, setSelectedTypes] = useState(ALL);
     const [searchText, setSearchText] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
+    const sourceOptions = useMemo(() => {
+        if (!tabKeys) {
+            return []
+        }
+        return [ALL, ...tabKeys].map(s => ({ value: s, label: s }))
+    }, [tabKeys])
 
 
-    const handleTypeChange = (value: number) => {
+    const handleTypeChange = (value: string) => {
         setSelectedTypes(value);
     };
 
@@ -24,7 +33,7 @@ export const Search: React.FC = () => {
     };
 
     const handleSearch = async () => {
-        await search(searchText);
+        await search(selectedTypes, searchText);
     };
 
     const handlePageChange = (page: number, pageSize: number) => {
@@ -32,25 +41,50 @@ export const Search: React.FC = () => {
         setPageSize(pageSize);
     };
 
-    // 模拟搜索函数
-    const performSearch = (type: number, text: string) => {
-        // 这里可以根据实际情况进行搜索逻辑的实现
-        // 假设返回一个包含搜索结果的数组
-        return Array.from({ length: 50 }, (_, i) => `Result ${i + 1}`);
-    };
-
     // 计算当前页的搜索结果
     const currentPageResults = searchResults.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
+    const handleGetMagnetLink = async (source: string, item: InfoModel) => {
+        let magnetLink = "";
+        let ok = true;
+        if (item.linkType === LinkType.Magnet) {
+            magnetLink = item.link;
+        } else {
+            try {
+                const response = await fetch(`/api/Search/GetMagnetLink/${source}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(item.link)
+                });
+                if (response.ok) {
+                    magnetLink = JSON.stringify(response);
+                } else {
+                    ok = false;
+                }
+            } catch (error) {
+                ok = false;
+            }
+        }
+        if (ok) {
+            navigator.clipboard.writeText(magnetLink);
+            message.success('复制成功');
+        } else {
+            message.error('复制失败');
+        }
+    };
+
     return (
-        <>
-            <Row>
+        <Row justify="center">
+            <Col span={24}>
                 <Select
                     placeholder="类型"
                     value={selectedTypes}
                     onChange={handleTypeChange}
                     style={{ width: '200px', marginRight: '10px' }}
-                    options={contentTypes}
+                    options={sourceOptions}
+                    loading={isSourceLoading}
                 />
                 <Input
                     placeholder="Enter search text"
@@ -61,26 +95,42 @@ export const Search: React.FC = () => {
                 <Button type="primary" onClick={handleSearch}>
                     搜索
                 </Button>
-            </Row>
-            <Row justify="center">
-                <List loading={isLoading}
+            </Col>
+            <Col span={20}>
+                <List
+                    loading={isLoading}
                     itemLayout="horizontal"
                     dataSource={currentPageResults}
-                    renderItem={(item, index) => (
-                        <Item key={index}>
-                            {item}
-                        </Item>
-                    )}
+                    renderItem={(source, index) =>
+                        <List
+                            key={`${source}${index}`}
+                            itemLayout="horizontal"
+                            dataSource={source.infos}
+                            renderItem={(item, idx) =>
+                                <Item key={`${source}${index}${idx}`}>
+                                    <Col span={19}>
+                                        <span>{item.name}</span>
+                                    </Col>
+                                    <Col span={2}>
+                                        <span style={{ marginLeft: '10px' }}>{item.size}</span>
+                                    </Col>
+                                    <Col span={3} style={{ textAlign: 'right' }}>
+                                        <Button onClick={() => handleGetMagnetLink(source.source, item)} type='link'>
+                                            获取磁力链接
+                                        </Button>
+                                    </Col>
+                                </Item>}
+                        />}
                 />
-            </Row>
-            <Row justify="center">
+            </Col>
+            {/* <Col span={24} >
                 <Pagination
                     current={currentPage}
                     pageSize={pageSize}
                     total={searchResults.length}
                     onChange={handlePageChange}
                 />
-            </Row>
-        </>
+            </Col> */}
+        </Row>
     );
 };

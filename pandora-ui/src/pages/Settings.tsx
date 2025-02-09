@@ -1,16 +1,12 @@
-import { useEffect, FC } from 'react';
+import { FC } from 'react';
 import { Tabs } from 'antd';
-import { useSettingsStore } from '../store/settingsStore';
-import { SinfferSetting } from '../components/SinfferSetting';
+import { useAutoFetchTabKeys } from '../store/allSourceStore';
+import { SnifferSetting } from '../components/SnifferSetting';
 
 const { TabPane } = Tabs;
 
 export const Settings: FC = () => {
-    const { tabKeys, isLoading, error, fetchTabKeys } = useSettingsStore();
-
-    useEffect(() => {
-        fetchTabKeys();
-    }, [fetchTabKeys]);
+    const { tabKeys, isLoading, error } = useAutoFetchTabKeys();
 
     if (isLoading) {
         return <div>Loading...</div>;
@@ -24,7 +20,7 @@ export const Settings: FC = () => {
         <Tabs defaultActiveKey="1">
             {tabKeys.map((key, index) => (
                 <TabPane tab={key} key={index + 1}>
-                    <SinfferSetting source={key} />
+                    <SnifferSetting source={key} />
                 </TabPane>
             ))}
         </Tabs>

@@ -1,3 +1,4 @@
+using System.Collections;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Pandora.Api.Contract;
@@ -18,7 +19,14 @@ public class SnifferController(IEnumerable<ISniffer> sniffers) : ControllerBase
     public IEnumerable<string>? GetAllKeys(string source)
     {
         var sniffer = sniffers.FirstOrDefault(p => p.SourceName == source);
-        return sniffer?.GetAllKeys();
+        return sniffer?.GetAllKeys() ?? [];
+    }
+
+    [HttpGet("{source}")]
+    public Task<Dictionary<string, string>> GetAllConfigurationAsync(string source)
+    {
+        var sniffer = sniffers.FirstOrDefault(p => p.SourceName == source);
+        return sniffer?.GetAllConfigurationAsync() ?? Task.FromResult(new Dictionary<string, string>());
     }
 
     [HttpPost("{source}")]

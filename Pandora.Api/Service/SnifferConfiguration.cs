@@ -16,6 +16,12 @@ public class SnifferConfigurationService<T>(PandoraDbContext dbContext) : ISniff
         return configuration.GetValueOrDefault(key);
     }
 
+    public async Task<Dictionary<string, string>> GetAllConfigurationAsync()
+    {
+        var configurations = await dbContext.Configurations.Where(c => c.Type == SourceName).ToListAsync();
+        return configurations.ToDictionary(p => p.Key, p => p.Value);
+    }
+
     public async Task UpdateConfigurationAsync(Dictionary<string, string> config, IEnumerable<string> keys)
     {
         var updateKeys = keys.Where(config.ContainsKey).ToList();

@@ -108,4 +108,10 @@ public abstract class CDNSnifferBase(
         }
         return result;
     }
+
+    public Task<Dictionary<string, string>> GetAllConfigurationAsync()
+    {
+        logger.LogDebug("Start getting all configuration information for {SourceName}", SourceName);
+        return snifferConfiguration.GetAllConfigurationAsync();
+    }
 }
