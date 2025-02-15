@@ -1,9 +1,11 @@
+using System.Text;
 using HtmlAgilityPack;
 using Microsoft.EntityFrameworkCore;
 using Pandora.Api.Contract;
 using Pandora.Api.Data;
 using Pandora.Api.Service;
 
+Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.

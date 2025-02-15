@@ -1,24 +1,44 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Form, Input, Button, Spin, message } from 'antd';
-import { useSnifferSettingStore } from '../store/snifferSettingStore';
 
 interface DynamicFormProps {
     source: string;
 }
 
 export const SnifferSetting: React.FC<DynamicFormProps> = ({ source }) => {
-    const { snifferSettings, fetchFormItems } = useSnifferSettingStore();
+    const [snifferSettings, setSnifferSettings] = useState<Record<string, string>>();
+    const [loading, setLoading] = useState(false);
     const [form] = Form.useForm();
     const [saving, setSaving] = useState(false);
 
     useEffect(() => {
-        fetchFormItems(source)
+        setLoading(true);
+        fetch(`api/sniffer/GetAllConfiguration/${source}`).then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch form items');
+            }
+            return response;
+        }).then(res => res.json())
+            .then(json => {
+                const config: Record<string, string> = json;
+                fetch(`api/sniffer/GetAllKeys/${source}`).then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch form items');
+                    }
+                    return response;
+                }).then(res => res.json())
+                    .then(keys => {
+                        for (const key of keys) {
+                            if (!config[key]) {
+                                config[key] = '';
+                            }
+                        }
+                        setSnifferSettings(config);
+                    })
+            }).finally(() => setLoading(false));
     }, [source]);
 
-    var config = useMemo(() => snifferSettings ? snifferSettings[source] : null, [snifferSettings])
-    var keys = useMemo(() => config ? Object.keys(config) : [], [config])
-
-    const snifferSetting = snifferSettings[source] || [];
+    var keys = useMemo(() => snifferSettings ? Object.keys(snifferSettings) : [], [snifferSettings])
     const onFinish = (values: any) => {
         console.log('Form values:', values);
     };
@@ -53,16 +73,19 @@ export const SnifferSetting: React.FC<DynamicFormProps> = ({ source }) => {
             setSaving(false);
         }
     }
+    if (loading) {
+        return <Spin></Spin>
+    }
 
     return (
-        config ?
+        snifferSettings ?
             <Form form={form} name="dynamic_form" onFinish={onFinish}>
                 {keys.map((item, index) => (
                     <Form.Item labelCol={{ flex: "100px" }} wrapperCol={{ flex: 1 }}
                         key={index}
                         label={item}
                         name={item}
-                        initialValue={snifferSetting[item]}
+                        initialValue={snifferSettings[item]}
                     >
                         <Input.TextArea autoSize />
                     </Form.Item>

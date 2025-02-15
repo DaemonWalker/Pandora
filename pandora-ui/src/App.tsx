@@ -55,15 +55,13 @@ const App: React.FC = () => {
       </Sider>
       <Layout>
         <Header style={{ padding: 0, background: colorBgLayout }} />
-        <Content style={{ margin: '0 16px', flex: 1 }}>
+        <Content style={{ margin: '0 16px', flex: 1, display: 'flex', flexDirection: 'column' }}>
           <div
             style={{
               padding: 24,
               minHeight: 360,
               background: colorBgContainer,
               borderRadius: borderRadiusLG,
-              maxHeight: "100%",
-              overflow: "auto",
             }}
           >
             <Routes>

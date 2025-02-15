@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Json;
 using HtmlAgilityPack;
 using RequestModel = Pandora.Api.Model.PandoraHttpClientRequestModel;
@@ -25,9 +26,10 @@ public sealed class PandoraHttpClient(IHttpClientFactory httpClientFactory)
         return await HtmlDocumentAsync(request, json);
     }
 
-    public async Task<HtmlDocument?> PostFormAsync(RequestModel request, Dictionary<string, string> formData)
+    public async Task<HtmlDocument?> PostFormAsync(RequestModel request, params KeyValuePair<string, string>[] formData)
     {
-        var content = new FormUrlEncodedContent(formData);
+        var data = string.Join("&", formData.Select(p => $"{p.Key}={p.Value}"));
+        var content = new StringContent(data, request.Encoding, "application/x-www-form-urlencoded");
         return await HtmlDocumentAsync(request, content);
     }
 
@@ -37,7 +39,7 @@ public sealed class PandoraHttpClient(IHttpClientFactory httpClientFactory)
         if (response?.IsSuccessStatusCode == true)
         {
             var doc = new HtmlDocument();
-            doc.Load(await response.Content.ReadAsStreamAsync());
+            doc.Load(await response.Content.ReadAsStreamAsync(), requestInfo.Encoding);
             return doc;
         }
         return null;

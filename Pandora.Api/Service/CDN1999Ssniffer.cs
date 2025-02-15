@@ -1,3 +1,4 @@
+using System.Text;
 using Pandora.Api.Contract;
 using Pandora.Api.Model;
 
@@ -10,4 +11,5 @@ public sealed class CDN1999Sniffer(
 ) : CDNSnifferBase(pandoraHttpClient, snifferConfiguration, logger)
 {
     public override string SourceName => "CDN1999";
+    protected override Encoding Encoding => Encoding.GetEncoding("gb2312");
 }
