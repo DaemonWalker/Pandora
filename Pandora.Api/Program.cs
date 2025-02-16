@@ -3,6 +3,7 @@ using HtmlAgilityPack;
 using Microsoft.EntityFrameworkCore;
 using Pandora.Api.Contract;
 using Pandora.Api.Data;
+using Pandora.Api.Middlewares;
 using Pandora.Api.Service;
 
 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -34,6 +35,7 @@ builder.Services.AddHttpClient<HttpClient>(client =>
 builder.Services.AddTransient<HtmlWeb>();
 
 var app = builder.Build();
+app.UseMiddleware<ExceptionCatcherMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

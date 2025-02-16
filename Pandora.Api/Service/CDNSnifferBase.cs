@@ -65,8 +65,8 @@ public abstract class CDNSnifferBase(
         return stream;
     }
 
-    public Task SetConfigurationAsync(Dictionary<string, string> config) =>
-        snifferConfiguration.UpdateConfigurationAsync(config, GetAllKeys());
+    public async Task SetConfigurationAsync(Dictionary<string, string> config) =>
+        await snifferConfiguration.UpdateConfigurationAsync(config, GetAllKeys());
 
     public async Task<IEnumerable<InfoModel>> SniffAsync(SearchModel searchModel)
     {
@@ -78,7 +78,7 @@ public abstract class CDNSnifferBase(
             new KeyValuePair<string, string>("searchsubmit", "yes")) ?? throw new LogicException("Get search result failed");
 
         logger.LogDebug("Get search result success");
-
+        logger.LogTrace("Get search result: {html}", doc.DocumentNode.OuterHtml);
         var hrefCollection = doc.DocumentNode.SelectNodes("//h3[@class='xs3']/a[1]");
         if (hrefCollection == null || hrefCollection.Count == 0)
         {
@@ -87,19 +87,12 @@ public abstract class CDNSnifferBase(
         }
         var list = hrefCollection.Skip(PageSize * (searchModel.Page ?? 1 - 1)).Take(PageSize);
         var result = new List<InfoModel>(PageSize);
+
         foreach (var node in list)
         {
             var text = node.InnerText.Split('\n');
             var name = text[0];
-            string size;
-            if (text.Length > 1)
-            {
-                size = text[1];
-            }
-            else
-            {
-                size = node.InnerText.Split(' ').Last();
-            }
+            var size = text.Length > 1 ? text[1] : text.Last();
 
             logger.LogTrace("Link outer html: {node}", node.OuterHtml);
 
@@ -108,6 +101,7 @@ public abstract class CDNSnifferBase(
 
             result.Add(new InfoModel(name, forumUrl, size, LinkType.Torrent));
         }
+
         return result;
     }
 

@@ -7,6 +7,7 @@ interface SearchState {
     error: string | null;
     isLoading: boolean;
     search: (source: string, query: string) => Promise<void>;
+    clearError: () => void
 }
 
 export const useSearchStore = create<SearchState>((set) => ({
@@ -20,13 +21,19 @@ export const useSearchStore = create<SearchState>((set) => ({
             const response = await fetch(url);
             if (response.ok) {
                 const data = await response.json();
-                set({ searchResults: data, isLoading: false });
+                set({ searchResults: data, error: null, isLoading: false });
             } else {
                 const errorText = await response.text();
-                set({ error: `Error: ${response.status} - ${errorText}`, isLoading: false });
+                console.error("catch", errorText)
+                set({ searchResults: [], error: `${errorText}`, isLoading: false });
+                console.error("catch", errorText)
             }
         } catch (error: any) {
-            set({ error: `Error: ${error.message}`, isLoading: false });
+            console.error(error)
+            set({ error: `${error.message}`, isLoading: false });
         }
     },
+    clearError: () => {
+        set({ error: null });
+    }
 }));

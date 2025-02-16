@@ -1,27 +1,37 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Select, Input, Button, List, Pagination, Row, Col, message } from 'antd';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Select, Input, Button, List, Row, Col, message } from 'antd';
 import { useSearchStore } from '../store/useSearchStore';
 import { InfoModel } from '../models/InfoModel';
 import { LinkType } from '../models/LinkType';
 import { useAutoFetchTabKeys } from '../store/allSourceStore';
-import { ALL } from '../models/Constants';
 
 const { Item } = List;
 const { Meta } = Item;
 
 
 export const Search: React.FC = () => {
-    const { tabKeys, isLoading: isSourceLoading } = useAutoFetchTabKeys();
-    const { searchResults, isLoading, search } = useSearchStore();
-    const [selectedTypes, setSelectedTypes] = useState(ALL);
+    const { searchResults, isLoading, search, error } = useSearchStore();
+    const [selectedTypes, setSelectedTypes] = useState('');
     const [searchText, setSearchText] = useState('');
+
+    const { tabKeys, isLoading: isSourceLoading } = useAutoFetchTabKeys();
 
     const sourceOptions = useMemo(() => {
         if (!tabKeys) {
             return []
         }
-        return [ALL, ...tabKeys].map(s => ({ value: s, label: s }))
+        return tabKeys.map(s => ({ value: s, label: s }))
     }, [tabKeys])
+    useEffect(() => {
+        if (tabKeys && tabKeys.length > 0) {
+            setSelectedTypes(tabKeys[0]);
+        }
+    }, [tabKeys])
+    useEffect(() => {
+        if (!isLoading && error) {
+            message.error(error)
+        }
+    }, [isLoading, error])
 
     const handleTypeChange = (value: string) => {
         setSelectedTypes(value);
@@ -33,7 +43,7 @@ export const Search: React.FC = () => {
 
     const handleSearch = async () => {
         await search(selectedTypes, searchText);
-
+        console.log(error)
     };
 
     const handleGetMagnetLink = async (source: string, item: InfoModel) => {
@@ -68,7 +78,7 @@ export const Search: React.FC = () => {
     };
 
     return (
-        <div style={{ display: "flex", flexDirection: "column", flex: 1, maxHeight: "100%" }}>
+        <div style={{ display: "flex", flexDirection: "column", flex: 1, maxHeight: "100%", gap: "10px" }}>
             <Row justify="center" gutter={[10, 10]}>
                 <Col lg={4}>
                     <Select

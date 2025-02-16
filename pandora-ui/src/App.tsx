@@ -49,13 +49,19 @@ const App: React.FC = () => {
 
   return (
     <Layout style={{ height: '100vh' }}>
-      <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
-        <div className="demo-logo-vertical" />
-        <Menu theme="dark" selectedKeys={[selectedKey]} defaultSelectedKeys={['1']} mode="inline" items={items} />
-      </Sider>
+      <Header style={{ display: 'flex', alignItems: 'center' }}>
+        <div className="demo-logo" />
+        <Menu
+          theme="dark"
+          mode="horizontal"
+          defaultSelectedKeys={['1']}
+          items={items}
+          style={{ flex: 1, minWidth: 0 }}
+          selectedKeys={[selectedKey]}
+        />
+      </Header>
       <Layout>
-        <Header style={{ padding: 0, background: colorBgLayout }} />
-        <Content style={{ margin: '0 16px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <Content style={{ margin: '16px', flex: 1, display: 'flex', flexDirection: 'column' }}>
           <div
             style={{
               padding: 24,
@@ -71,7 +77,7 @@ const App: React.FC = () => {
           </div>
         </Content>
         <Footer style={{ textAlign: 'center' }}>
-          Ant Design ©{new Date().getFullYear()} Created by Ant UED
+          影视资源搜索 ©{new Date().getFullYear()} Created by StK
         </Footer>
       </Layout>
     </Layout>

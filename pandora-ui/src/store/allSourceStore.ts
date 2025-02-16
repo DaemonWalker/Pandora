@@ -31,15 +31,15 @@ export const useAllSourceStore = create<SourceState>((set) => ({
 // 自定义 Hook，在 tabKeys 为空时自动调用 fetchTabKeys
 export const useAutoFetchTabKeys = () => {
     const { tabKeys, fetchTabKeys } = useAllSourceStore();
-    const isTabKeysEmpty = tabKeys.length === 0;
 
     // 使用 useEffect 在组件挂载时检查 tabKeys 是否为空
     // 如果为空，则调用 fetchTabKeys 方法
     React.useEffect(() => {
-        if (isTabKeysEmpty) {
-            fetchTabKeys();
+        if (!tabKeys || tabKeys.length === 0) {
+            fetchTabKeys()
         }
-    }, [isTabKeysEmpty, fetchTabKeys]);
+
+    }, [fetchTabKeys, tabKeys]);
 
     return useAllSourceStore();
 };
